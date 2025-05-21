@@ -1,45 +1,100 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>MINES 1WIN</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MINES 5x5</title>
   <style>
-    body { font-family: sans-serif; background: #121212; color: white; display: flex; flex-direction: column; align-items: center; }
-    .board { display: grid; grid-template-columns: repeat(5, 60px); gap: 10px; margin-top: 30px; }
-    .cell { width: 60px; height: 60px; background: #1e1e1e; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 24px; cursor: pointer; }
+    body {
+      background-color: #0d0f1a;
+      color: white;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(5, 60px);
+      grid-template-rows: repeat(5, 60px);
+      gap: 5px;
+    }
+
+    .cell {
+      width: 60px;
+      height: 60px;
+      background-color: #16a2c7;
+      border: none;
+      font-size: 24px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .cell:disabled {
+      cursor: default;
+      background-color: #0f2c3f;
+    }
+
+    .safe {
+      background-color: #23d160 !important;
+    }
+
+    .mine {
+      background-color: #ff3860 !important;
+    }
   </style>
 </head>
 <body>
-  <h1>💣 MINES 1WIN</h1>
+  <h1>MINES 1WIN</h1>
   <div class="board" id="board"></div>
+
   <script>
-    const board = document.getElementById("board");
-    let mines = Array(25).fill(false);
-    let revealed = Array(25).fill(false);
-    let mineCount = 3;
-    while (mineCount > 0) {
-      let pos = Math.floor(Math.random() * 25);
-      if (!mines[pos]) {
-        mines[pos] = true;
-        mineCount--;
+    const boardSize = 5;
+    const numMines = 3;
+    const board = document.getElementById('board');
+    let minePositions = [];
+
+    function generateMines() {
+      const positions = new Set();
+      while (positions.size < numMines) {
+        const index = Math.floor(Math.random() * boardSize * boardSize);
+        positions.add(index);
+      }
+      minePositions = Array.from(positions);
+    }
+
+    function reveal(cell, index) {
+      cell.disabled = true;
+      if (minePositions.includes(index)) {
+        cell.classList.add('mine');
+        cell.textContent = '💣';
+        alert('¡BOOM! Tocaste una mina.');
+      } else {
+        cell.classList.add('safe');
+        cell.textContent = '⭐';
       }
     }
-    for (let i = 0; i < 25; i++) {
-      const cell = document.createElement("div");
-      cell.classList.add("cell");
-      cell.addEventListener("click", () => {
-        if (revealed[i]) return;
-        revealed[i] = true;
-        if (mines[i]) {
-          cell.textContent = "❌";
-          alert("¡Perdiste!");
-        } else {
-          cell.textContent = "⭐";
-        }
-      });
-      board.appendChild(cell);
+
+    function createBoard() {
+      generateMines();
+      for (let i = 0; i < boardSize * boardSize; i++) {
+        const btn = document.createElement('button');
+        btn.className = 'cell';
+        btn.onclick = () => reveal(btn, i);
+        board.appendChild(btn);
+      }
     }
+
+    createBoard();
   </script>
 </body>
 </html>
